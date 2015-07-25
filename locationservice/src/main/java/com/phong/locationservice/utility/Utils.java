@@ -1,4 +1,4 @@
-package com.phong.locationservice;
+package com.phong.locationservice.utility;
 
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -16,6 +16,7 @@ import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.phong.locationservice.R;
 
 /**
  * Created by Phong Nguyen on 7/25/15.

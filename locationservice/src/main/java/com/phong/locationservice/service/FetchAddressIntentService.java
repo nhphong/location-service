@@ -12,7 +12,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.phong.locationservice.R;
-import com.phong.locationservice.Utils;
+import com.phong.locationservice.utility.Utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
