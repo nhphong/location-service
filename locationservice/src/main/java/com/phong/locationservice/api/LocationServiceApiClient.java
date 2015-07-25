@@ -57,20 +57,22 @@ public class LocationServiceApiClient implements GoogleApiClient.ConnectionCallb
     }
 
     public void connect() {
-        if (!mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.connect();
+        if (mGoogleApiClient.isConnected() || mGoogleApiClient.isConnecting()) {
+            return;
         }
+        mGoogleApiClient.connect();
     }
 
     public void connectAndStartLocationUpdates() {
-        if (!mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.connect();
-            mStartLocationUpdatesAfterConnect = true;
+        if (mGoogleApiClient.isConnected() || mGoogleApiClient.isConnecting()) {
+            return;
         }
+        mStartLocationUpdatesAfterConnect = true;
+        mGoogleApiClient.connect();
     }
 
     public void disconnect() {
-        if (mGoogleApiClient.isConnected()) {
+        if (mGoogleApiClient.isConnected() || mGoogleApiClient.isConnecting()) {
             mGoogleApiClient.disconnect();
             Log.d(TAG, "onDisconnected");
         }
@@ -78,6 +80,10 @@ public class LocationServiceApiClient implements GoogleApiClient.ConnectionCallb
 
     public boolean isConnected() {
         return mGoogleApiClient.isConnected();
+    }
+
+    public boolean isConnecting() {
+        return mGoogleApiClient.isConnecting();
     }
 
     public void startLocationUpdates() {

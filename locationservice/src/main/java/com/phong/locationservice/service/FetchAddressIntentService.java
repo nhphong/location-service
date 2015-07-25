@@ -22,7 +22,6 @@ import java.util.Locale;
 /**
  * Created by Phong Nguyen on 7/25/15.
  */
-
 public class FetchAddressIntentService extends IntentService {
 
     public static final String TAG = FetchAddressIntentService.class.getSimpleName();
