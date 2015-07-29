@@ -13,9 +13,13 @@ import android.util.Log;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.phong.locationservice.api.LocationServiceApiClient;
+import com.phong.locationservice.database.model.Task;
+import com.phong.locationservice.utility.Utils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.UUID;
+
+import io.realm.Realm;
+import io.realm.RealmResults;
 
 /**
  * Created by Phong Nguyen on 7/25/15.
@@ -23,19 +27,10 @@ import java.util.List;
 public class AlarmService extends Service implements LocationListener {
 
     public static final String TAG = AlarmService.class.getSimpleName();
-    public static final String ONLY_GET_CURRENT_LOCATION = "only_get_current_location";
-
     private LocationServiceApiClient mLocationServiceApiClient;
-    private boolean mOnlyGetTheCurrentLocation;
-    private ResultReceiver mResultReceiver;
-    private static List<Location> mTargets = new ArrayList<>();
 
-    // Be careful: the latest call overrides all the previous calls
-    public static void start(Context context, boolean onlyGetCurrentLocation, ResultReceiver resultReceiver) {
-        Intent i = new Intent(context, AlarmService.class);
-        i.putExtra(ONLY_GET_CURRENT_LOCATION, onlyGetCurrentLocation);
-        i.putExtra(Constants.EXTRA_RESULT_RECEIVER, resultReceiver);
-        context.startService(i);
+    public static void start(Context context) {
+        context.startService(new Intent(context, AlarmService.class));
     }
 
     public static void stop(Context context) {
@@ -44,9 +39,7 @@ public class AlarmService extends Service implements LocationListener {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "onStartCommand (OnlyGetCurrentLocation = " + intent.getBooleanExtra(ONLY_GET_CURRENT_LOCATION, false) + ")");
-        mOnlyGetTheCurrentLocation = intent.getBooleanExtra(ONLY_GET_CURRENT_LOCATION, false);
-        mResultReceiver = intent.getParcelableExtra(Constants.EXTRA_RESULT_RECEIVER);
+        Log.d(TAG, "onStartCommand");
 
         if (mLocationServiceApiClient == null) {
             mLocationServiceApiClient = new LocationServiceApiClient(this, 5000, 5000, LocationRequest.PRIORITY_HIGH_ACCURACY, this);
@@ -77,18 +70,29 @@ public class AlarmService extends Service implements LocationListener {
     @Override
     public void onLocationChanged(final Location location) {
         Log.d(TAG, "onLocationChanged");
+        RealmResults<Task> taskList = getAllTask(this);
+        if (taskList == null || taskList.isEmpty()) {
+            stopSelf();
+            return;
+        }
+
+        for (Task task : taskList) {
+            if (task.getType() == Task.Type.GET_CURRENT_LOCATION) {
+                FetchAddressIntentService.start(this, location, new ResultReceiver(new Handler()) {
+                    @Override
+                    protected void onReceiveResult(int resultCode, Bundle resultData) {
+                        if (mResultReceiver != null) {
+                            resultData.putString(Constants.RESULT_TAG, location.getLatitude() + " : " + location.getLongitude());
+                            mResultReceiver.send(resultCode, resultData);
+                        }
+                    }
+                });
+                stopSelf();
+            }
+        }
 
         if (mOnlyGetTheCurrentLocation) {
-            FetchAddressIntentService.start(this, location, new ResultReceiver(new Handler()) {
-                @Override
-                protected void onReceiveResult(int resultCode, Bundle resultData) {
-                    if (mResultReceiver != null) {
-                        resultData.putString(Constants.RESULT_TAG, location.getLatitude() + " : " + location.getLongitude());
-                        mResultReceiver.send(resultCode, resultData);
-                    }
-                }
-            });
-            stopSelf();
+
         }
 //        else if (reachAnyTarget(location)) {
 //            Intent intent = new Intent(this, ???);
@@ -98,41 +102,77 @@ public class AlarmService extends Service implements LocationListener {
 //        }
     }
 
-//    private boolean reachAnyTarget(Location loc) {
-//        if (mTargets == null || mTargets.isEmpty()) {
-//            return false;
-//        }
-//        for (Location target : mTargets) {
-//            if (loc.distanceTo(target) < 100) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-//
-//    public static void addTarget(Location target) {
-//        mTargets.add(target);
-//    }
-//
-//    public static void removeTarget(Location target, Context context) {
-//        if (mTargets == null || mTargets.isEmpty()) {
-//            AlarmService.stop(context);
-//            return;
-//        }
-//        for (Location candidate : mTargets) {
-//            if (candidate.distanceTo(target) == 0) {
-//                mTargets.remove(candidate);
-//                break;
-//            }
-//        }
-//
-//        if (mTargets.isEmpty()) {
-//            AlarmService.stop(context);
-//        }
-//    }
-//
-//    public static void removeAllTargets(Context context) {
-//        mTargets.clear();
-//        AlarmService.stop(context);
-//    }
+    public static String getCurrentLocation(Context context) {
+        Realm realm = Realm.getInstance(context);
+        realm.beginTransaction();
+        Task task = realm.createObject(Task.class);
+        task.setId(UUID.randomUUID().toString());
+        task.setCreatedAt(System.currentTimeMillis());
+        task.setType(Task.Type.GET_CURRENT_LOCATION);
+        realm.commitTransaction();
+
+        if (!Utils.isServiceRunning(context, AlarmService.class)) {
+            AlarmService.start(context);
+        }
+
+        return task.getId();
+    }
+
+    public static String addTarget(Context context, double latitude, double longitude) {
+        Realm realm = Realm.getInstance(context);
+        realm.beginTransaction();
+        Task task = realm.createObject(Task.class);
+        task.setId(UUID.randomUUID().toString());
+        task.setCreatedAt(System.currentTimeMillis());
+        task.setType(Task.Type.ADD_TARGET);
+        task.setLatitude(latitude);
+        task.setLongitude(longitude);
+        realm.commitTransaction();
+
+        if (!Utils.isServiceRunning(context, AlarmService.class)) {
+            AlarmService.start(context);
+        }
+
+        return task.getId();
+    }
+
+    public static void cancelTask(Context context, String taskId) {
+        Realm realm = Realm.getInstance(context);
+        Task task = realm.where(Task.class).equalTo("id", taskId).findFirst();
+        if (task != null) {
+            realm.beginTransaction();
+            task.removeFromRealm();
+            realm.commitTransaction();
+
+            if (noTaskLeft(context) && Utils.isServiceRunning(context, AlarmService.class)) {
+                AlarmService.stop(context);
+            }
+        }
+    }
+
+    public static void cancelAllTask(Context context) {
+        RealmResults<Task> taskList = getAllTask(context);
+        Realm realm = Realm.getInstance(context);
+
+        if (taskList != null && !taskList.isEmpty()) {
+            realm.beginTransaction();
+            for (Task task : taskList) {
+                task.removeFromRealm();
+            }
+            realm.commitTransaction();
+        }
+
+        if (Utils.isServiceRunning(context, AlarmService.class)) {
+            AlarmService.stop(context);
+        }
+    }
+
+    public static RealmResults<Task> getAllTask(Context context) {
+        return Realm.getInstance(context).where(Task.class).findAll();
+    }
+
+    public static boolean noTaskLeft(Context context) {
+        RealmResults<Task> taskList = getAllTask(context);
+        return taskList == null || taskList.isEmpty();
+    }
 }
