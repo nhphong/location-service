@@ -9,9 +9,9 @@ public class Task extends RealmObject {
 
     private String id;
     private long createdAt;
+    private Type type;
     private double latitude;
     private double longitude;
-    private TaskType type;
 
     public String getId() {
         return id;
@@ -27,6 +27,14 @@ public class Task extends RealmObject {
 
     public void setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
     }
 
     public double getLatitude() {
@@ -45,15 +53,7 @@ public class Task extends RealmObject {
         this.longitude = longitude;
     }
 
-    public TaskType getType() {
-        return type;
-    }
-
-    public void setType(TaskType type) {
-        this.type = type;
-    }
-
-    public enum TaskType {
+    public enum Type {
         GET_CURRENT_LOCATION,
         ADD_TARGET
     }
