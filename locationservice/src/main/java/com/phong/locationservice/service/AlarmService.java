@@ -4,10 +4,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
-import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.ResultReceiver;
 import android.util.Log;
 
 import com.google.android.gms.location.LocationListener;
@@ -76,24 +73,24 @@ public class AlarmService extends Service implements LocationListener {
             return;
         }
 
-        for (Task task : taskList) {
-            if (task.getType() == Task.Type.GET_CURRENT_LOCATION) {
-                FetchAddressIntentService.start(this, location, new ResultReceiver(new Handler()) {
-                    @Override
-                    protected void onReceiveResult(int resultCode, Bundle resultData) {
-                        if (mResultReceiver != null) {
-                            resultData.putString(Constants.RESULT_TAG, location.getLatitude() + " : " + location.getLongitude());
-                            mResultReceiver.send(resultCode, resultData);
-                        }
-                    }
-                });
-                stopSelf();
-            }
-        }
-
-        if (mOnlyGetTheCurrentLocation) {
-
-        }
+//        for (Task task : taskList) {
+//            if (task.getType() == Task.Type.GET_CURRENT_LOCATION) {
+//                FetchAddressIntentService.start(this, location, new ResultReceiver(new Handler()) {
+//                    @Override
+//                    protected void onReceiveResult(int resultCode, Bundle resultData) {
+//                        if (mResultReceiver != null) {
+//                            resultData.putString(Constants.RESULT_TAG, location.getLatitude() + " : " + location.getLongitude());
+//                            mResultReceiver.send(resultCode, resultData);
+//                        }
+//                    }
+//                });
+//                stopSelf();
+//            }
+//        }
+//
+//        if (mOnlyGetTheCurrentLocation) {
+//
+//        }
 //        else if (reachAnyTarget(location)) {
 //            Intent intent = new Intent(this, ???);
 //            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -108,7 +105,7 @@ public class AlarmService extends Service implements LocationListener {
         Task task = realm.createObject(Task.class);
         task.setId(UUID.randomUUID().toString());
         task.setCreatedAt(System.currentTimeMillis());
-        task.setType(Task.Type.GET_CURRENT_LOCATION);
+        task.setType(Task.GET_CURRENT_LOCATION);
         realm.commitTransaction();
 
         if (!Utils.isServiceRunning(context, AlarmService.class)) {
@@ -124,7 +121,7 @@ public class AlarmService extends Service implements LocationListener {
         Task task = realm.createObject(Task.class);
         task.setId(UUID.randomUUID().toString());
         task.setCreatedAt(System.currentTimeMillis());
-        task.setType(Task.Type.ADD_TARGET);
+        task.setType(Task.ADD_TARGET);
         task.setLatitude(latitude);
         task.setLongitude(longitude);
         realm.commitTransaction();

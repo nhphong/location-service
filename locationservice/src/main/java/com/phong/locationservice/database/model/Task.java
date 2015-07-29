@@ -1,15 +1,21 @@
 package com.phong.locationservice.database.model;
 
 import io.realm.RealmObject;
+import io.realm.annotations.Ignore;
 
 /**
  * Created by nguyenphong on 7/28/15.
  */
 public class Task extends RealmObject {
 
+    @Ignore
+    public static final String GET_CURRENT_LOCATION = "get_current_location";
+    @Ignore
+    public static final String ADD_TARGET = "add_target";
+
     private String id;
     private long createdAt;
-    private Type type;
+    private String type;
     private double latitude;
     private double longitude;
 
@@ -29,11 +35,11 @@ public class Task extends RealmObject {
         this.createdAt = createdAt;
     }
 
-    public Type getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(Type type) {
+    public void setType(String type) {
         this.type = type;
     }
 
@@ -51,10 +57,5 @@ public class Task extends RealmObject {
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
-    }
-
-    public enum Type {
-        GET_CURRENT_LOCATION,
-        ADD_TARGET
     }
 }
