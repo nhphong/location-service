@@ -2,7 +2,6 @@ package com.phong.locationservice.service;
 
 public class Constants {
     public static final String RESULT_MSG = "result_msg";
-    public static final String RESULT_TAG = "result_tag";
     public static final int RESULT_SUCCESS = 1;
     public static final int RESULT_FAILURE = 0;
 

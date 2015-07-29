@@ -4,13 +4,18 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.ResultReceiver;
 import android.util.Log;
 
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.phong.locationservice.api.LocationServiceApiClient;
 import com.phong.locationservice.database.model.Task;
+import com.phong.locationservice.event.DetectLocationEvent;
+import com.phong.locationservice.event.ReachTargetEvent;
 import com.phong.locationservice.utility.Utils;
 
 import java.util.UUID;
@@ -73,30 +78,26 @@ public class AlarmService extends Service implements LocationListener {
             return;
         }
 
-//        for (Task task : taskList) {
-//            if (task.getType() == Task.Type.GET_CURRENT_LOCATION) {
-//                FetchAddressIntentService.start(this, location, new ResultReceiver(new Handler()) {
-//                    @Override
-//                    protected void onReceiveResult(int resultCode, Bundle resultData) {
-//                        if (mResultReceiver != null) {
-//                            resultData.putString(Constants.RESULT_TAG, location.getLatitude() + " : " + location.getLongitude());
-//                            mResultReceiver.send(resultCode, resultData);
-//                        }
-//                    }
-//                });
-//                stopSelf();
-//            }
-//        }
-//
-//        if (mOnlyGetTheCurrentLocation) {
-//
-//        }
-//        else if (reachAnyTarget(location)) {
-//            Intent intent = new Intent(this, ???);
-//            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//            startActivity(intent);
-//            stopSelf();
-//        }
+        for (final Task task : taskList) {
+            switch (task.getType()) {
+                case Task.GET_CURRENT_LOCATION:
+                    FetchAddressIntentService.start(this, location, new ResultReceiver(new Handler()) {
+                        @Override
+                        protected void onReceiveResult(int resultCode, Bundle resultData) {
+                            String address = (resultCode == Constants.RESULT_SUCCESS) ? resultData.getString(Constants.RESULT_MSG) : "";
+                            DetectLocationEvent.fire(task.getId(), task.getCreatedAt(), location.getLatitude(), location.getLongitude(), address);
+                            cancelTask(AlarmService.this, task.getId());
+                        }
+                    });
+                    break;
+                case Task.ADD_TARGET:
+                    if (location.distanceTo(task.getLocation()) < 60) {
+                        ReachTargetEvent.fire(task.getId(), task.getCreatedAt(), task.getLatitude(), task.getLongitude());
+                        cancelTask(this, task.getId());
+                    }
+                    break;
+            }
+        }
     }
 
     public static String getCurrentLocation(Context context) {

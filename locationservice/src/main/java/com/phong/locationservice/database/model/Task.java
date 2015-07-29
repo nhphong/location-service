@@ -1,5 +1,7 @@
 package com.phong.locationservice.database.model;
 
+import android.location.Location;
+
 import io.realm.RealmObject;
 import io.realm.annotations.Ignore;
 
@@ -57,5 +59,12 @@ public class Task extends RealmObject {
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
+    }
+
+    public Location getLocation() {
+        Location location = new Location("location");
+        location.setLatitude(this.latitude);
+        location.setLongitude(this.longitude);
+        return location;
     }
 }
