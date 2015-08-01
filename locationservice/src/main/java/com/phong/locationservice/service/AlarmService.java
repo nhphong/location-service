@@ -12,6 +12,7 @@ import android.util.Log;
 
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import com.phong.locationservice.Constants;
 import com.phong.locationservice.api.LocationServiceApiClient;
 import com.phong.locationservice.database.model.Task;
 import com.phong.locationservice.event.DetectLocationEvent;
@@ -85,14 +86,14 @@ public class AlarmService extends Service implements LocationListener {
                         @Override
                         protected void onReceiveResult(int resultCode, Bundle resultData) {
                             String address = (resultCode == Constants.RESULT_SUCCESS) ? resultData.getString(Constants.RESULT_MSG) : "";
-                            DetectLocationEvent.fire(task.getId(), task.getCreatedAt(), location.getLatitude(), location.getLongitude(), address);
+                            DetectLocationEvent.fire(AlarmService.this, task.getId(), task.getCreatedAt(), location.getLatitude(), location.getLongitude(), address);
                             cancelTask(AlarmService.this, task.getId());
                         }
                     });
                     break;
                 case Task.ADD_TARGET:
                     if (location.distanceTo(task.getLocation()) < 60) {
-                        ReachTargetEvent.fire(task.getId(), task.getCreatedAt(), task.getLatitude(), task.getLongitude());
+                        ReachTargetEvent.fire(this, task.getId(), task.getCreatedAt(), task.getLatitude(), task.getLongitude());
                         cancelTask(this, task.getId());
                     }
                     break;

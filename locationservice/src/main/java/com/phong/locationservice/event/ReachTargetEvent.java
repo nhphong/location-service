@@ -1,26 +1,21 @@
 package com.phong.locationservice.event;
 
-import de.greenrobot.event.EventBus;
+import android.content.Context;
+import android.content.Intent;
+
+import com.phong.locationservice.Constants;
 
 /**
- * Created by nguyenphong on 7/30/15.
+ * Created by Phong Nguyen on 7/30/15.
  */
 public class ReachTargetEvent {
 
-    private String taskId;
-    private long taskCreatedAt;
-    private double latitude;
-    private double longitude;
-
-    private ReachTargetEvent(String taskId, long taskCreatedAt, double latitude, double longitude) {
-        this.taskId = taskId;
-        this.taskCreatedAt = taskCreatedAt;
-        this.latitude = latitude;
-        this.longitude = longitude;
-    }
-
-    public static void fire(String taskId, long taskCreatedAt, double latitude, double longitude) {
-        ReachTargetEvent event = new ReachTargetEvent(taskId, taskCreatedAt, latitude, longitude);
-        EventBus.getDefault().post(event);
+    public static void fire(Context context, String taskId, long taskCreatedAt, double latitude, double longitude) {
+        Intent intent = new Intent(Constants.REACH_TARGET_EVENT_SIGNATURE);
+        intent.putExtra(Constants.EXTRA_TASK_ID, taskId);
+        intent.putExtra(Constants.EXTRA_TASK_CREATED_AT, taskCreatedAt);
+        intent.putExtra(Constants.EXTRA_LATITUDE, latitude);
+        intent.putExtra(Constants.EXTRA_LONGITUDE, longitude);
+        context.sendBroadcast(intent);
     }
 }
