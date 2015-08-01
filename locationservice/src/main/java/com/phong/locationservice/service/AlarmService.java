@@ -68,26 +68,41 @@ public class AlarmService extends Service implements LocationListener {
     @Override
     public void onLocationChanged(Location location) {
         Log.d(TAG, "onLocationChanged");
+        Realm realm = Realm.getInstance(this);
         RealmResults<Task> taskList = getAllTask(this);
         if (taskList == null || taskList.isEmpty()) {
             stopSelf();
             return;
         }
 
-        for (Task task : taskList) {
+        realm.beginTransaction();
+        for (int i = 0; i < taskList.size(); ++i) {
+            Task task = taskList.get(i);
+
             switch (task.getType()) {
                 case Task.GET_CURRENT_LOCATION:
                     LocationEvent.fire(this, task.getId(), task.getCreatedAt(), location.getLatitude(), location.getLongitude());
-                    cancelTask(this, task.getId());
+                    task.removeFromRealm();
+                    if (noTaskLeft(this)) {
+                        stopSelf();
+                    }
                     break;
-                case Task.ADD_TARGET:
-                    if (location.distanceTo(task.getLocation()) < 60) {
+                case Task.WATCH_TARGET:
+                    Location target = new Location("target");
+                    target.setLatitude(task.getLatitude());
+                    target.setLongitude(task.getLongitude());
+
+                    if (location.distanceTo(target) < 60) {
                         LocationEvent.fire(this, task.getId(), task.getCreatedAt(), task.getLatitude(), task.getLongitude());
-                        cancelTask(this, task.getId());
+                        task.removeFromRealm();
+                        if (noTaskLeft(this)) {
+                            stopSelf();
+                        }
                     }
                     break;
             }
         }
+        realm.commitTransaction();
     }
 
     public static String getCurrentLocation(Context context) {
@@ -112,7 +127,7 @@ public class AlarmService extends Service implements LocationListener {
         Task task = realm.createObject(Task.class);
         task.setId(UUID.randomUUID().toString());
         task.setCreatedAt(System.currentTimeMillis());
-        task.setType(Task.ADD_TARGET);
+        task.setType(Task.WATCH_TARGET);
         task.setLatitude(latitude);
         task.setLongitude(longitude);
         realm.commitTransaction();

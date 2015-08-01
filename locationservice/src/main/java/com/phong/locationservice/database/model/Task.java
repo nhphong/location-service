@@ -13,7 +13,7 @@ public class Task extends RealmObject {
     @Ignore
     public static final String GET_CURRENT_LOCATION = "get_current_location";
     @Ignore
-    public static final String ADD_TARGET = "add_target";
+    public static final String WATCH_TARGET = "watch_target";
 
     private String id;
     private long createdAt;
@@ -59,12 +59,5 @@ public class Task extends RealmObject {
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
-    }
-
-    public Location getLocation() {
-        Location location = new Location("location");
-        location.setLatitude(this.latitude);
-        location.setLongitude(this.longitude);
-        return location;
     }
 }
