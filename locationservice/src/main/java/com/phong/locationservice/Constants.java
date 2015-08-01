@@ -11,8 +11,6 @@ public class Constants {
     public static final String EXTRA_TASK_CREATED_AT = "task_created_at";
     public static final String EXTRA_LATITUDE = "latitude";
     public static final String EXTRA_LONGITUDE = "longitude";
-    public static final String EXTRA_ADDRESS = "address";
 
-    public static final String REACH_TARGET_EVENT_SIGNATURE = "com.phong.locationservice.event.reachtarget";
-    public static final String DETECT_LOCATION_EVENT_SIGNATURE = "com.phong.locationservice.event.detectlocation";
+    public static final String LOCATION_EVENT_SIGNATURE = "com.phong.locationservice.event.location";
 }

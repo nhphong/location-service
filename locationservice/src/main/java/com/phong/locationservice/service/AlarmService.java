@@ -4,19 +4,14 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
-import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.ResultReceiver;
 import android.util.Log;
 
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
-import com.phong.locationservice.Constants;
 import com.phong.locationservice.api.LocationServiceApiClient;
 import com.phong.locationservice.database.model.Task;
-import com.phong.locationservice.event.DetectLocationEvent;
-import com.phong.locationservice.event.ReachTargetEvent;
+import com.phong.locationservice.event.LocationEvent;
 import com.phong.locationservice.utility.Utils;
 
 import java.util.UUID;
@@ -71,7 +66,7 @@ public class AlarmService extends Service implements LocationListener {
     }
 
     @Override
-    public void onLocationChanged(final Location location) {
+    public void onLocationChanged(Location location) {
         Log.d(TAG, "onLocationChanged");
         RealmResults<Task> taskList = getAllTask(this);
         if (taskList == null || taskList.isEmpty()) {
@@ -79,21 +74,15 @@ public class AlarmService extends Service implements LocationListener {
             return;
         }
 
-        for (final Task task : taskList) {
+        for (Task task : taskList) {
             switch (task.getType()) {
                 case Task.GET_CURRENT_LOCATION:
-                    FetchAddressIntentService.start(this, location, new ResultReceiver(new Handler()) {
-                        @Override
-                        protected void onReceiveResult(int resultCode, Bundle resultData) {
-                            String address = (resultCode == Constants.RESULT_SUCCESS) ? resultData.getString(Constants.RESULT_MSG) : "";
-                            DetectLocationEvent.fire(AlarmService.this, task.getId(), task.getCreatedAt(), location.getLatitude(), location.getLongitude(), address);
-                            cancelTask(AlarmService.this, task.getId());
-                        }
-                    });
+                    LocationEvent.fire(this, task.getId(), task.getCreatedAt(), location.getLatitude(), location.getLongitude());
+                    cancelTask(this, task.getId());
                     break;
                 case Task.ADD_TARGET:
                     if (location.distanceTo(task.getLocation()) < 60) {
-                        ReachTargetEvent.fire(this, task.getId(), task.getCreatedAt(), task.getLatitude(), task.getLongitude());
+                        LocationEvent.fire(this, task.getId(), task.getCreatedAt(), task.getLatitude(), task.getLongitude());
                         cancelTask(this, task.getId());
                     }
                     break;
