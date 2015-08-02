@@ -1,7 +1,5 @@
 package com.phong.locationservice.database.model;
 
-import android.location.Location;
-
 import io.realm.RealmObject;
 import io.realm.annotations.Ignore;
 

@@ -16,6 +16,7 @@ import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.phong.locationservice.Constants;
 import com.phong.locationservice.R;
 
 /**
@@ -23,7 +24,7 @@ import com.phong.locationservice.R;
  */
 public class Utils {
 
-    public static final String TAG = Utils.class.getSimpleName();
+    public static final String TAG = Constants.TAG + Utils.class.getSimpleName();
 
     public static boolean checkGooglePlayServices(Activity activity) {
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(activity);

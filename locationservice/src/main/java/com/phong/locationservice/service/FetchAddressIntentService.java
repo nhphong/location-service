@@ -25,7 +25,7 @@ import java.util.Locale;
  */
 public class FetchAddressIntentService extends IntentService {
 
-    public static final String TAG = FetchAddressIntentService.class.getSimpleName();
+    public static final String TAG = Constants.TAG + FetchAddressIntentService.class.getSimpleName();
 
     public static void start(Context context, Location location, ResultReceiver resultReceiver) {
         Intent i = new Intent(context, FetchAddressIntentService.class);

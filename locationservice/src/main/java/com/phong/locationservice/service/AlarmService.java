@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import com.phong.locationservice.Constants;
 import com.phong.locationservice.api.LocationServiceApiClient;
 import com.phong.locationservice.database.model.Task;
 import com.phong.locationservice.event.LocationEvent;
@@ -24,7 +25,7 @@ import io.realm.RealmResults;
  */
 public class AlarmService extends Service implements LocationListener {
 
-    public static final String TAG = AlarmService.class.getSimpleName();
+    public static final String TAG = Constants.TAG + AlarmService.class.getSimpleName();
     private LocationServiceApiClient mLocationServiceApiClient;
 
     public static void start(Context context) {

@@ -9,13 +9,14 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.phong.locationservice.Constants;
 
 /**
  * Created by Phong Nguyen on 7/25/15.
  */
 public class LocationServiceApiClient implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    public static final String TAG = LocationServiceApiClient.class.getSimpleName();
+    public static final String TAG = Constants.TAG + LocationServiceApiClient.class.getSimpleName();
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private LocationListener mLocationListener;
