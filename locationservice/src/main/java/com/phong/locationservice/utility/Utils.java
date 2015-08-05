@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -136,5 +137,9 @@ public class Utils {
         }
         Log.d(TAG, serviceClass + " is NOT running");
         return false;
+    }
+
+    public static void goToLocationSettings(Context context) {
+        context.startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
     }
 }
