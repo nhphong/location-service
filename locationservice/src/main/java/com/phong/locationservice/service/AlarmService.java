@@ -1,10 +1,13 @@
 package com.phong.locationservice.service;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.google.android.gms.location.LocationListener;
@@ -64,6 +67,20 @@ public class AlarmService extends Service implements LocationListener {
         mLocationServiceApiClient.disconnect();
         mLocationServiceApiClient = null;
         Log.d(TAG, "onDestroy");
+    }
+
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        Intent restartServiceIntent = new Intent(getApplicationContext(), this.getClass());
+        restartServiceIntent.setPackage(getPackageName());
+
+        PendingIntent restartServicePendingIntent = PendingIntent.getService(getApplicationContext(), 1, restartServiceIntent, PendingIntent.FLAG_ONE_SHOT);
+        AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+        alarmManager.set(
+                AlarmManager.ELAPSED_REALTIME,
+                SystemClock.elapsedRealtime() + 750,
+                restartServicePendingIntent);
+        super.onTaskRemoved(rootIntent);
     }
 
     @Override
