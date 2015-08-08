@@ -183,4 +183,14 @@ public class AlarmService extends Service implements LocationListener {
         RealmResults<Task> taskList = getAllTask(context);
         return taskList == null || taskList.isEmpty();
     }
+
+    public static boolean isTaskDone(Context context, String taskId) {
+        if (taskId == null) {
+            return true;
+        }
+
+        Realm realm = Realm.getInstance(context);
+        Task task = realm.where(Task.class).equalTo("id", taskId).findFirst();
+        return task == null;
+    }
 }
