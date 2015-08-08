@@ -27,13 +27,18 @@ public class Utils {
 
     public static final String TAG = Constants.TAG + Utils.class.getSimpleName();
 
-    public static boolean checkGooglePlayServices(Activity activity) {
+    public static boolean checkGooglePlayServices(final Activity activity) {
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(activity);
         final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
         if (resultCode != ConnectionResult.SUCCESS) {
             if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-                GooglePlayServicesUtil.getErrorDialog(resultCode, activity, PLAY_SERVICES_RESOLUTION_REQUEST).show();
+                GooglePlayServicesUtil.getErrorDialog(resultCode, activity, PLAY_SERVICES_RESOLUTION_REQUEST, new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        activity.finish();
+                    }
+                }).show();
             } else {
                 Log.e(TAG, "This device does not support Google Play Services SDK");
                 activity.finish();
