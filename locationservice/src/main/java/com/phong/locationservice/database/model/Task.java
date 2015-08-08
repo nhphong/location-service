@@ -18,6 +18,7 @@ public class Task extends RealmObject {
     private String type;
     private double latitude;
     private double longitude;
+    private String address;
 
     public String getId() {
         return id;
@@ -57,5 +58,13 @@ public class Task extends RealmObject {
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

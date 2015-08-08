@@ -82,7 +82,7 @@ public class AlarmService extends Service implements LocationListener {
 
             switch (task.getType()) {
                 case Task.GET_CURRENT_LOCATION:
-                    LocationEvent.fire(this, task.getId(), task.getCreatedAt(), location.getLatitude(), location.getLongitude(), Task.GET_CURRENT_LOCATION);
+                    LocationEvent.fire(this, task.getId(), task.getCreatedAt(), location.getLatitude(), location.getLongitude(), null, Task.GET_CURRENT_LOCATION);
                     task.removeFromRealm();
                     if (noTaskLeft(this)) {
                         stopSelf();
@@ -94,7 +94,7 @@ public class AlarmService extends Service implements LocationListener {
                     target.setLongitude(task.getLongitude());
 
                     if (location.distanceTo(target) < 100) {
-                        LocationEvent.fire(this, task.getId(), task.getCreatedAt(), task.getLatitude(), task.getLongitude(), Task.WATCH_TARGET);
+                        LocationEvent.fire(this, task.getId(), task.getCreatedAt(), task.getLatitude(), task.getLongitude(), task.getAddress(), Task.WATCH_TARGET);
                         task.removeFromRealm();
                         if (noTaskLeft(this)) {
                             stopSelf();
@@ -122,7 +122,7 @@ public class AlarmService extends Service implements LocationListener {
         return task.getId();
     }
 
-    public static String addTarget(Context context, double latitude, double longitude) {
+    public static String addTarget(Context context, double latitude, double longitude, String address) {
         Realm realm = Realm.getInstance(context);
         realm.beginTransaction();
         Task task = realm.createObject(Task.class);
@@ -131,6 +131,7 @@ public class AlarmService extends Service implements LocationListener {
         task.setType(Task.WATCH_TARGET);
         task.setLatitude(latitude);
         task.setLongitude(longitude);
+        task.setAddress(address);
         realm.commitTransaction();
 
         if (!Utils.isServiceRunning(context, AlarmService.class)) {

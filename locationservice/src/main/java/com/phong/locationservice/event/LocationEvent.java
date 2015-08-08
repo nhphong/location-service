@@ -14,7 +14,7 @@ public class LocationEvent {
 
     public static final String TAG = Constants.TAG + LocationEvent.class.getSimpleName();
 
-    public static void fire(Context context, String taskId, long taskCreatedAt, double latitude, double longitude, String type) {
+    public static void fire(Context context, String taskId, long taskCreatedAt, double latitude, double longitude, String address, String type) {
         Intent intent = null;
         if (Task.GET_CURRENT_LOCATION.equals(type)) {
             Log.d(TAG, "Send Broadcast with " + Constants.LOCATION_DETECTED_EVENT_SIGNATURE + " signature");
@@ -29,6 +29,9 @@ public class LocationEvent {
             intent.putExtra(Constants.EXTRA_TASK_CREATED_AT, taskCreatedAt);
             intent.putExtra(Constants.EXTRA_LATITUDE, latitude);
             intent.putExtra(Constants.EXTRA_LONGITUDE, longitude);
+            if (address != null) {
+                intent.putExtra(Constants.EXTRA_ADDRESS, address);
+            }
             context.sendBroadcast(intent);
         }
     }
