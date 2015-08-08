@@ -196,7 +196,8 @@ public class AlarmService extends Service implements LocationListener {
 
         if (taskList != null && !taskList.isEmpty()) {
             realm.beginTransaction();
-            for (Task task : taskList) {
+            for (int i = 0; i < taskList.size(); ++i) {
+                Task task = taskList.get(i);
                 task.removeFromRealm();
             }
             realm.commitTransaction();
