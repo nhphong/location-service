@@ -184,7 +184,7 @@ public class AlarmListView extends ScrollView implements View.OnClickListener {
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        mContext.registerReceiver(mBroadcastReceiver, new IntentFilter(Constants.LOCATION_EVENT_SIGNATURE));
+        mContext.registerReceiver(mBroadcastReceiver, new IntentFilter(Constants.LOCATION_DETECTED_EVENT_SIGNATURE));
     }
 
     @Override

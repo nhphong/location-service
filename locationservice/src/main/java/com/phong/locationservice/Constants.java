@@ -12,6 +12,7 @@ public class Constants {
     public static final String EXTRA_LATITUDE = "latitude";
     public static final String EXTRA_LONGITUDE = "longitude";
 
-    public static final String LOCATION_EVENT_SIGNATURE = "com.phong.locationservice.event.location";
+    public static final String NEAR_TARGET_EVENT_SIGNATURE = "com.phong.locationservice.event.neartarget";
+    public static final String LOCATION_DETECTED_EVENT_SIGNATURE = "com.phong.locationservice.event.locationdetected";
     public static final String TAG = "Location Service -- ";
 }

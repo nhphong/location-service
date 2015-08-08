@@ -82,7 +82,7 @@ public class AlarmService extends Service implements LocationListener {
 
             switch (task.getType()) {
                 case Task.GET_CURRENT_LOCATION:
-                    LocationEvent.fire(this, task.getId(), task.getCreatedAt(), location.getLatitude(), location.getLongitude());
+                    LocationEvent.fire(this, task.getId(), task.getCreatedAt(), location.getLatitude(), location.getLongitude(), Task.GET_CURRENT_LOCATION);
                     task.removeFromRealm();
                     if (noTaskLeft(this)) {
                         stopSelf();
@@ -94,7 +94,7 @@ public class AlarmService extends Service implements LocationListener {
                     target.setLongitude(task.getLongitude());
 
                     if (location.distanceTo(target) < 100) {
-                        LocationEvent.fire(this, task.getId(), task.getCreatedAt(), task.getLatitude(), task.getLongitude());
+                        LocationEvent.fire(this, task.getId(), task.getCreatedAt(), task.getLatitude(), task.getLongitude(), Task.WATCH_TARGET);
                         task.removeFromRealm();
                         if (noTaskLeft(this)) {
                             stopSelf();
@@ -141,6 +141,10 @@ public class AlarmService extends Service implements LocationListener {
     }
 
     public static void cancelTask(Context context, String taskId) {
+        if (taskId == null) {
+            return;
+        }
+
         Realm realm = Realm.getInstance(context);
         Task task = realm.where(Task.class).equalTo("id", taskId).findFirst();
         if (task != null) {
