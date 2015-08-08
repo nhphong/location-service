@@ -158,6 +158,20 @@ public class AlarmService extends Service implements LocationListener {
         return task.getId();
     }
 
+    public static void updateTarget(Context context, String taskId, String newAddress) {
+        if (taskId == null) {
+            return;
+        }
+
+        Realm realm = Realm.getInstance(context);
+        Task task = realm.where(Task.class).equalTo("id", taskId).findFirst();
+        if (task != null && task.getType().equals(Task.WATCH_TARGET)) {
+            realm.beginTransaction();
+            task.setAddress(newAddress);
+            realm.commitTransaction();
+        }
+    }
+
     public static void cancelTask(Context context, String taskId) {
         if (taskId == null) {
             return;
