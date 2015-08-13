@@ -52,7 +52,7 @@ public class AlarmService extends Service implements LocationListener {
             mLocationServiceApiClient.connectAndStartLocationUpdates();
         }
 
-        return START_REDELIVER_INTENT;
+        return START_STICKY;
     }
 
     @Override
