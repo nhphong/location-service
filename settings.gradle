@@ -1,2 +1,2 @@
-include ':locationservice'
+include ':locationservice', ':sample'
 
