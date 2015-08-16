@@ -14,6 +14,10 @@
             android:name=".service.FetchAddressIntentService"
             android:exported="false" />
 
+        <service
+            android:name=".service.FetchLatLngIntentService"
+            android:exported="false" />
+
     </application>
 
 </manifest>
