@@ -97,6 +97,18 @@ public class Utils {
         }
     }
 
+    public static synchronized void showProgressDialogWithoutDimBk(Context context, CharSequence message) {
+        if (progressDialog == null || !progressDialog.isShowing()) {
+            progressDialog = new ProgressDialog(context, R.style.ProgressDialogWithoutDimBk);
+            progressDialog.setTitle("");
+            progressDialog.setMessage(message != null ? message : "");
+            progressDialog.setIndeterminate(true);
+            progressDialog.setCancelable(false);
+            progressDialog.setOnCancelListener(null);
+            progressDialog.show();
+        }
+    }
+
     public static synchronized void dismissProgressDialog() {
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();

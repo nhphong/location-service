@@ -1,0 +1,9 @@
+<resources>
+
+    <style name="ProgressDialogWithoutDimBk" parent="@android:style/Widget.ProgressBar">
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:layout_gravity">center</item>
+    </style>
+
+</resources>
