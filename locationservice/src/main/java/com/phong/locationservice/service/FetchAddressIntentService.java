@@ -89,6 +89,10 @@ public class FetchAddressIntentService extends IntentService {
                 addressFragments.add(address.getAddressLine(i));
             }
 
+            if (!TextUtils.isEmpty(address.getCountryName())) {
+                addressFragments.add(address.getCountryName());
+            }
+
             Log.d(TAG, getString(R.string.address_found));
             bundle.putString(Constants.RESULT_MSG, TextUtils.join(", ", addressFragments));
             resultReceiver.send(Constants.RESULT_SUCCESS, bundle);
