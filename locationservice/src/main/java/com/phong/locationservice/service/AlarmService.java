@@ -110,7 +110,7 @@ public class AlarmService extends Service implements LocationListener {
                     target.setLatitude(task.getLatitude());
                     target.setLongitude(task.getLongitude());
 
-                    if (location.distanceTo(target) < 150) {
+                    if (location.distanceTo(target) < 300) {
                         LocationEvent.fire(this, task.getId(), task.getCreatedAt(), task.getLatitude(), task.getLongitude(), task.getAddress(), Task.WATCH_TARGET);
                         task.removeFromRealm();
                         if (noTaskLeft(this)) {
